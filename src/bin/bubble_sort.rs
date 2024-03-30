@@ -20,3 +20,17 @@ fn main() {
     println!("before sorting: {:?}", data);
     println!("after sorting: {:?}", sorted);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_sorts_correctly() {
+        let arr: [i64; 7] = [9, 3, 7, 4, 69, 420, 42];
+
+        let ans: [i64; 7] = [3, 4, 7, 9, 42, 69, 420];
+
+        assert_eq!(bubble_sort(&arr), ans);
+    }
+}
