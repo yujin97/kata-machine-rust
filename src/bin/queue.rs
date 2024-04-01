@@ -68,16 +68,14 @@ where
                 let pop_value = pop_value_ref.borrow().value;
                 if let Some(head) = &self.head {
                     let mut temp = Rc::clone(&head);
-                    for i in 0..self.length - 1 {
+                    for _ in 0..self.length - 2 {
                         let next = Rc::clone(
                             temp.borrow()
                                 .next
                                 .as_ref()
                                 .expect("Failed to traverse queue"),
                         );
-                        if i < self.length - 2 {
-                            temp = next;
-                        }
+                        temp = next;
                     }
 
                     temp.borrow_mut().next = None;
