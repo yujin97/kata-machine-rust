@@ -50,44 +50,26 @@ where
     }
 
     fn deque(&mut self) -> Option<T> {
-        if self.length == 0 {
-            return None;
-        } else if self.length == 1 {
-            if let Some(pop_value_ref) = &self.head {
-                let pop_value = pop_value_ref.borrow().value;
+        if self.length > 0 {
+            if let Some(head) = &self.head {
+                let pop_value = head.borrow().value;
 
-                self.head = None;
-                self.tail = None;
+                let head = Rc::clone(head);
+                let head = head.borrow();
+                let next = head.next.as_ref();
+                if let Some(next) = next {
+                    self.head = Some(Rc::clone(next));
+                } else {
+                    self.head = None;
+                    self.tail = None;
+                }
+
                 self.length -= 1;
 
                 return Some(pop_value);
             }
-            return None;
-        } else {
-            if let Some(pop_value_ref) = &self.tail {
-                let pop_value = pop_value_ref.borrow().value;
-                if let Some(head) = &self.head {
-                    let mut temp = Rc::clone(&head);
-                    for _ in 0..self.length - 2 {
-                        let next = Rc::clone(
-                            temp.borrow()
-                                .next
-                                .as_ref()
-                                .expect("Failed to traverse queue"),
-                        );
-                        temp = next;
-                    }
-
-                    temp.borrow_mut().next = None;
-
-                    self.tail = Some(temp);
-                    self.length -= 1;
-                }
-
-                return Some(pop_value);
-            }
-            return None;
         }
+        return None;
     }
 
     fn peek(&self) -> Option<T> {
@@ -123,5 +105,35 @@ fn main() {
         } else {
             head = None;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn queue_works_normally() {
+        let mut list = Queue::new();
+
+        list.enqueue(5);
+        list.enqueue(7);
+        list.enqueue(9);
+
+        assert_eq!(list.deque(), Some(5));
+        assert_eq!(list.length, 2);
+
+        list.enqueue(11);
+
+        assert_eq!(list.deque(), Some(7));
+        assert_eq!(list.deque(), Some(9));
+        assert_eq!(list.peek(), Some(11));
+        assert_eq!(list.deque(), Some(11));
+        assert_eq!(list.deque(), None);
+        assert_eq!(list.length, 0);
+
+        list.enqueue(69);
+        assert_eq!(list.peek(), Some(69));
+        assert_eq!(list.length, 1);
     }
 }
