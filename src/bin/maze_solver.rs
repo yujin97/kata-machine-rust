@@ -1,4 +1,4 @@
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Debug)]
 struct Point {
     x: usize,
     y: usize,
@@ -36,6 +36,7 @@ enum Direction {
     Left,
 }
 
+#[derive(Debug)]
 struct WalkResult {
     result: bool,
     seen: Vec<Vec<bool>>,
@@ -51,9 +52,17 @@ fn walk(
     mut path: Vec<Point>,
 ) -> WalkResult {
     // Base cases
+    if curr.y >= maze.len() || curr.x >= maze[0].len() {
+        return WalkResult {
+            result: false,
+            seen,
+            path,
+        };
+    }
+
     let current_point_value = maze[curr.y]
         .chars()
-        .next()
+        .nth(curr.x)
         .expect("Failed to access current point value");
 
     if current_point_value == wall {
@@ -85,6 +94,7 @@ fn walk(
 
     // recurse
     // pre
+    seen[curr.y][curr.x] = true;
     path.push(curr.clone());
     let mut result = false;
 
@@ -115,4 +125,23 @@ fn walk(
     return WalkResult { result, seen, path };
 }
 
-fn main() {}
+fn main() {
+    let maze = [
+        "xxxxxxxxxx x".to_string(),
+        "x        x x".to_string(),
+        "x        x x".to_string(),
+        "x xxxxxxxx x".to_string(),
+        "x          x".to_string(),
+        "x xxxxxxxxxx".to_string(),
+    ];
+
+    let current = Point::parse(10, 0).unwrap();
+    let end = Point::parse(1, 5).unwrap();
+
+    let seen = vec![false; 12];
+    let seen = vec![seen; 6];
+
+    let result = walk(&maze, 'x', current, end, seen, Vec::new());
+
+    println!("{:?}", result);
+}
