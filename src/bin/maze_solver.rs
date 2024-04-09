@@ -125,6 +125,16 @@ fn walk(
     return WalkResult { result, seen, path };
 }
 
+fn maze_solver(maze: &[String], wall: char, current: Point, end: Point) -> Vec<Point> {
+    let col = maze[0].len();
+    let row = maze.len();
+
+    let seen = vec![false; col];
+    let seen = vec![seen; row];
+
+    walk(maze, wall, current, end, seen, Vec::new()).path
+}
+
 fn main() {
     let maze = [
         "xxxxxxxxxx x".to_string(),
@@ -137,11 +147,48 @@ fn main() {
 
     let current = Point::parse(10, 0).unwrap();
     let end = Point::parse(1, 5).unwrap();
-
-    let seen = vec![false; 12];
-    let seen = vec![seen; 6];
-
-    let result = walk(&maze, 'x', current, end, seen, Vec::new());
+    let result = maze_solver(&maze, 'x', current, end);
 
     println!("{:?}", result);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn maze_solver_solves_maze() {
+        let maze = [
+            "xxxxxxxxxx x".to_string(),
+            "x        x x".to_string(),
+            "x        x x".to_string(),
+            "x xxxxxxxx x".to_string(),
+            "x          x".to_string(),
+            "x xxxxxxxxxx".to_string(),
+        ];
+
+        let current = Point::parse(10, 0).unwrap();
+        let end = Point::parse(1, 5).unwrap();
+        let result = maze_solver(&maze, 'x', current, end);
+
+        let maze_result = vec![
+            Point::parse(10, 0).unwrap(),
+            Point::parse(10, 1).unwrap(),
+            Point::parse(10, 2).unwrap(),
+            Point::parse(10, 3).unwrap(),
+            Point::parse(10, 4).unwrap(),
+            Point::parse(9, 4).unwrap(),
+            Point::parse(8, 4).unwrap(),
+            Point::parse(7, 4).unwrap(),
+            Point::parse(6, 4).unwrap(),
+            Point::parse(5, 4).unwrap(),
+            Point::parse(4, 4).unwrap(),
+            Point::parse(3, 4).unwrap(),
+            Point::parse(2, 4).unwrap(),
+            Point::parse(1, 4).unwrap(),
+            Point::parse(1, 5).unwrap(),
+        ];
+
+        assert_eq!(result, maze_result);
+    }
 }
