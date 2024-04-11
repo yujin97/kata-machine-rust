@@ -13,6 +13,7 @@ type SharedNode<T> = Rc<RefCell<Node<T>>>;
 struct DoublyLinkedList<T> {
     length: usize,
     head: Option<SharedNode<T>>,
+    tail: Option<SharedNode<T>>,
 }
 
 impl<T> DoublyLinkedList<T>
@@ -23,6 +24,7 @@ where
         Self {
             length: 0,
             head: None,
+            tail: None,
         }
     }
 
@@ -36,6 +38,14 @@ where
         };
 
         let shared_new_node = Rc::new(RefCell::new(new_node));
+
+        if self.length == 0 {
+            self.head = Some(Rc::clone(&shared_new_node));
+            self.tail = Some(shared_new_node);
+            self.length += 1;
+
+            return;
+        }
 
         if let Some(old_head) = old_head {
             let next = Rc::clone(old_head);
@@ -52,12 +62,15 @@ where
     fn insert_at(&mut self, item: T, idx: usize) -> bool {
         if idx > self.length {
             return false;
-        }
-
-        if idx == 0 {
+        } else if idx == 0 {
             self.prepend(item);
             return true;
+        } else if idx == self.length {
+            self.append(item);
+            return true;
         }
+
+        self.length += 1;
 
         let old_head = &self.head;
 
@@ -69,20 +82,10 @@ where
 
         let shared_new_node = Rc::new(RefCell::new(new_node));
 
-        // we always have a head at this point
-        // computation is delegated to prepend
-        // when idx == 0
-        // length >= idx > 0
-        // self.length is at least 1
         if let Some(old_head) = old_head {
             let mut current_pointer = Rc::clone(old_head);
 
-            for _ in 0..({
-                match idx {
-                    0 => 0,
-                    _ => idx - 1,
-                }
-            }) {
+            for _ in 0..idx {
                 let current = Rc::clone(&current_pointer);
                 let borrowed_current = current.borrow();
 
@@ -93,33 +96,57 @@ where
                 }
             }
 
-            let node_before_idx = Rc::clone(&current_pointer);
+            let target_node = Rc::clone(&current_pointer);
 
-            let borrowed_node_before_idx = node_before_idx.borrow();
+            let borrowed_target_node = target_node.borrow();
 
-            let next = borrowed_node_before_idx.next.as_ref();
+            let prev = borrowed_target_node.next.as_ref();
 
-            if let Some(next) = next {
-                let next = Rc::clone(next);
+            if let Some(prev) = prev {
+                let prev = Rc::clone(prev);
 
-                shared_new_node.borrow_mut().next = Some(next);
+                prev.borrow_mut().next = Some(Rc::clone(&shared_new_node));
+                shared_new_node.borrow_mut().next = Some(prev);
             }
 
-            let prev = Rc::clone(&node_before_idx);
-            shared_new_node.borrow_mut().prev = Some(prev);
+            let next = Rc::clone(&target_node);
+            next.borrow_mut().prev = Some(Rc::clone(&shared_new_node));
 
-            let mut borrowed_node_before_idx = node_before_idx.borrow_mut();
-            borrowed_node_before_idx.next = Some(Rc::clone(&shared_new_node));
+            shared_new_node.borrow_mut().next = Some(next);
 
-            let borrowed_new_node = shared_new_node.borrow();
-            let next = borrowed_new_node.next.as_ref();
+            true
+        } else {
+            false
+        }
+    }
 
-            if let Some(next) = next {
-                next.borrow_mut().prev = Some(Rc::clone(&shared_new_node));
-            }
+    fn append(&mut self, item: T) {
+        let new_node = Node {
+            value: item,
+            prev: None,
+            next: None,
+        };
+
+        let shared_new_node = Rc::new(RefCell::new(new_node));
+
+        if self.length == 0 {
+            self.head = Some(Rc::clone(&shared_new_node));
+            self.tail = Some(shared_new_node);
+            self.length += 1;
+
+            return;
         }
 
-        true
+        if let Some(tail) = &self.tail {
+            let tail = Rc::clone(&tail);
+
+            shared_new_node.borrow_mut().prev = Some(Rc::clone(&tail));
+
+            tail.borrow_mut().next = Some(Rc::clone(&shared_new_node));
+        }
+
+        self.tail = Some(shared_new_node);
+        self.length += 1;
     }
 }
 
