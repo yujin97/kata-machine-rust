@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::fmt::Display;
 use std::rc::Rc;
+use std::thread::current;
 
 struct Node<T> {
     value: T,
@@ -18,7 +19,7 @@ struct DoublyLinkedList<T> {
 
 impl<T> DoublyLinkedList<T>
 where
-    T: Copy + Display,
+    T: Copy + Display + PartialEq,
 {
     fn new() -> Self {
         Self {
@@ -147,6 +148,77 @@ where
 
         self.tail = Some(shared_new_node);
         self.length += 1;
+    }
+
+    fn remove(&mut self, item: T) -> Option<T> {
+        if self.length == 0 {
+            return None;
+        }
+
+        let mut current_pointer = match &self.head {
+            Some(head) => Some(Rc::clone(head)),
+            None => None,
+        };
+
+        for _ in 0..self.length {
+            if let Some(some_current_pointer) = current_pointer.as_ref() {
+                let current = Rc::clone(some_current_pointer);
+                if current.borrow().value == item {
+                    break;
+                }
+
+                let borrowed_current = current.borrow();
+                current_pointer = match &borrowed_current.next {
+                    Some(next) => Some(Rc::clone(next)),
+                    _ => None,
+                };
+            }
+        }
+
+        if current_pointer.is_none() {
+            return None;
+        }
+
+        let current_pointer = current_pointer.expect("Failed to access current pointer");
+        let borrowed_current_pointer = current_pointer.borrow();
+        let prev = &borrowed_current_pointer.next;
+        let next = &borrowed_current_pointer.prev;
+
+        if let Some(prev) = prev {
+            match next {
+                Some(next) => prev.borrow_mut().next = Some(Rc::clone(next)),
+                None => prev.borrow_mut().next = None,
+            }
+        };
+
+        if let Some(next) = next {
+            match prev {
+                Some(prev) => next.borrow_mut().prev = Some(Rc::clone(prev)),
+                None => next.borrow_mut().prev = None,
+            }
+        };
+
+        if let Some(head) = &self.head {
+            if Rc::ptr_eq(&current_pointer, head) {
+                self.head = match next {
+                    Some(next) => Some(Rc::clone(next)),
+                    None => None,
+                }
+            }
+        };
+
+        if let Some(tail) = &self.tail {
+            if Rc::ptr_eq(&current_pointer, tail) {
+                self.tail = match prev {
+                    Some(prev) => Some(Rc::clone(prev)),
+                    None => None,
+                }
+            }
+        };
+
+        self.length -= 1;
+
+        Some(borrowed_current_pointer.value)
     }
 }
 
