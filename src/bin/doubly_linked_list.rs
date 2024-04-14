@@ -157,10 +157,6 @@ where
             }
         }
 
-        if current_pointer.is_none() {
-            return None;
-        }
-
         match current_pointer {
             Some(node) => Some(self.remove_node(node)),
             None => None,
