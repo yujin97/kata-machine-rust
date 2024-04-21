@@ -2,38 +2,7 @@ use std::cell::RefCell;
 use std::fmt::Display;
 use std::rc::Rc;
 
-struct BinaryNode<T> {
-    value: T,
-    left: Option<SharedBinaryNode<T>>,
-    right: Option<SharedBinaryNode<T>>,
-}
-
-type SharedBinaryNode<T> = Rc<RefCell<BinaryNode<T>>>;
-
-impl<T> BinaryNode<T>
-where
-    T: Copy + Display,
-{
-    fn new(value: T) -> Self {
-        Self {
-            value,
-            left: None,
-            right: None,
-        }
-    }
-
-    fn add_left_node(&mut self, value: T) {
-        let left = Self::new(value);
-
-        self.left = Some(Rc::new(RefCell::new(left)));
-    }
-
-    fn add_right_node(&mut self, value: T) {
-        let right = Self::new(value);
-
-        self.right = Some(Rc::new(RefCell::new(right)));
-    }
-}
+use dsa::binary_tree::{BinaryNode, SharedBinaryNode};
 
 fn walk<T: Display + Copy>(curr: Option<&SharedBinaryNode<T>>, mut path: Vec<T>) -> Vec<T> {
     match curr {
