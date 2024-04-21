@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::fmt::Display;
 use std::rc::Rc;
 
+#[derive(Clone)]
 pub struct BinaryNode<T> {
     pub value: T,
     pub left: Option<SharedBinaryNode<T>>,
