@@ -1,6 +1,4 @@
-use std::cell::RefCell;
 use std::fmt::Display;
-use std::rc::Rc;
 
 use dsa::binary_tree::{BinaryNode, SharedBinaryNode};
 
@@ -35,7 +33,7 @@ fn main() {
         .borrow_mut()
         .add_left_node(4321);
 
-    let path = in_order_walk(&Rc::new(RefCell::new(head)));
+    let path = in_order_walk(&SharedBinaryNode::from_binary_node(head));
 
     println!("{:?}", path);
 }

@@ -1,6 +1,5 @@
 use dsa::binary_tree::{BinaryNode, SharedBinaryNode};
 use dsa::queue::Queue;
-use std::cell::RefCell;
 use std::rc::Rc;
 
 fn bfs(head: &SharedBinaryNode<i64>, needle: i64) -> bool {
@@ -31,7 +30,7 @@ fn bfs(head: &SharedBinaryNode<i64>, needle: i64) -> bool {
 }
 
 fn main() {
-    let head = Rc::new(RefCell::new(BinaryNode::new(69)));
+    let head = SharedBinaryNode::from_binary_node(BinaryNode::new(69));
 
     head.borrow_mut().add_left_node(420);
     head.borrow_mut().add_right_node(1234);
