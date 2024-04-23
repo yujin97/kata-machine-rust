@@ -37,3 +37,19 @@ fn main() {
 
     println!("{:?}", path);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use dsa::binary_tree::get_test_tree_1;
+
+    #[test]
+    fn pre_order_works() {
+        let tree = SharedBinaryNode::from_binary_node(get_test_tree_1());
+
+        assert_eq!(
+            pre_order_walk(&tree),
+            vec![20, 10, 5, 7, 15, 50, 30, 29, 45, 100]
+        )
+    }
+}

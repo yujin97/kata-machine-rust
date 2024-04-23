@@ -45,3 +45,19 @@ fn main() {
     println!("there is 420 in the tree: {:?}", bfs(&head, 420));
     println!("there is 567 in the tree: {:?}", bfs(&head, 567));
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use dsa::binary_tree::get_test_tree_1;
+
+    #[test]
+    fn bt_bfs_works() {
+        let tree1 = SharedBinaryNode::from_binary_node(get_test_tree_1());
+
+        assert_eq!(bfs(&tree1, 45), true);
+        assert_eq!(bfs(&tree1, 7), true);
+        assert_eq!(bfs(&tree1, 69), false);
+    }
+}
+

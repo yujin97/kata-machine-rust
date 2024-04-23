@@ -54,3 +54,95 @@ where
         self.right = Some(SharedBinaryNode::from_binary_node(right));
     }
 }
+
+pub fn get_test_tree_1() -> BinaryNode<i64> {
+    BinaryNode {
+        value: 20,
+        right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+            value: 50,
+            right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                value: 100,
+                right: None,
+                left: None,
+            })),
+            left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                value: 30,
+                right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                    value: 45,
+                    right: None,
+                    left: None,
+                })),
+                left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                    value: 29,
+                    right: None,
+                    left: None,
+                })),
+            })),
+        })),
+        left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+            value: 10,
+            right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                value: 15,
+                right: None,
+                left: None,
+            })),
+            left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                value: 5,
+                right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                    value: 7,
+                    right: None,
+                    left: None,
+                })),
+                left: None,
+            })),
+        })),
+    }
+}
+
+pub fn get_test_tree_2() -> BinaryNode<i64> {
+    BinaryNode {
+        value: 20,
+        right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+            value: 50,
+            right: None,
+            left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                value: 30,
+                right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                    value: 45,
+                    right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                        value: 49,
+                        left: None,
+                        right: None,
+                    })),
+                    left: None,
+                })),
+                left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                    value: 29,
+                    right: None,
+                    left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                        value: 21,
+                        right: None,
+                        left: None,
+                    })),
+                })),
+            })),
+        })),
+        left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+            value: 10,
+            right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                value: 15,
+                right: None,
+                left: None,
+            })),
+            left: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                value: 5,
+                right: Some(SharedBinaryNode::from_binary_node(BinaryNode {
+                    value: 7,
+                    right: None,
+                    left: None,
+                })),
+                left: None,
+            })),
+        })),
+    }
+}
