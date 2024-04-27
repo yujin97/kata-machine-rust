@@ -1,8 +1,8 @@
+use dsa::graph::WeightedAdjacencyMatrix;
 use std::collections::VecDeque;
 
-type WeightedAdjacentMatrix = Vec<Vec<usize>>;
-
-fn bfs(graph: WeightedAdjacentMatrix, source: usize, needle: usize) -> Option<Vec<usize>> {
+#[allow(unused)]
+fn bfs(graph: &WeightedAdjacencyMatrix, source: usize, needle: usize) -> Option<Vec<usize>> {
     let mut seen = vec![false; graph.len()];
     let mut prev = vec![None; graph.len()];
 
@@ -54,3 +54,22 @@ fn bfs(graph: WeightedAdjacentMatrix, source: usize, needle: usize) -> Option<Ve
 }
 
 fn main() {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use dsa::graph::get_matrix_2;
+
+    #[test]
+    fn bfs_works() {
+        let matrix = get_matrix_2();
+
+        let expected = vec![0, 1, 4, 5, 6];
+
+        assert_eq!(bfs(&matrix, 0, 6), Some(expected));
+
+        let expected = None;
+
+        assert_eq!(bfs(&matrix, 6, 0), expected);
+    }
+}
