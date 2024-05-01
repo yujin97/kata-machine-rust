@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::HashMap, fmt::Debug, hash::Hash, ops::Deref, ptr, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, hash::Hash, ops::Deref, ptr, rc::Rc};
 
 #[allow(unused)]
 struct Node<T> {
@@ -27,7 +27,7 @@ impl<T> Eq for SharedNode<T> {}
 
 impl<T> Hash for SharedNode<T> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        ptr::hash(&**self, state)
+        ptr::hash(&***self, state)
     }
 }
 
@@ -62,7 +62,7 @@ struct LRU<K, V> {
 #[allow(unused)]
 impl<K, V> LRU<K, V>
 where
-    K: Copy + Eq + PartialEq + Hash + Debug,
+    K: Copy + Eq + PartialEq + Hash,
     V: Copy,
 {
     fn new(capacity: usize) -> Self {
@@ -180,11 +180,10 @@ where
         }
 
         let tail = self.tail.as_ref().unwrap().clone();
-        self.detach(tail);
+        self.detach(tail.clone());
 
-        let tail = self.tail.as_ref().unwrap().clone();
         let key = self.reverse_lookup.get(&tail).expect("Failed to find key");
-        self.lookup.remove(&key);
+        self.lookup.remove(&key).is_some();
         self.reverse_lookup.remove(&tail);
         self.length -= 1;
     }
@@ -193,6 +192,18 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn hash_works() {
+        let node_1 = SharedNode::new(69);
+        let node_2 = node_1.clone();
+
+        let mut reverse_map = HashMap::new();
+
+        reverse_map.insert(node_1.clone(), "hello");
+
+        assert!(reverse_map.contains_key(&node_2));
+    }
 
     #[test]
     fn lru_works() {
@@ -210,5 +221,12 @@ mod tests {
 
         lru.update("ball", 69420);
         assert_eq!(lru.get("ball"), Some(69420));
+        assert_eq!(lru.get("foo"), None);
+        assert_eq!(lru.get("bar"), Some(420));
+        lru.update("foo", 69);
+        assert_eq!(lru.get("bar"), Some(420));
+        assert_eq!(lru.get("foo"), Some(69));
+
+        assert_eq!(lru.get("baz"), None);
     }
 }
